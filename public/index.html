@@ -1,0 +1,89 @@
+<!doctype html>
+
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SAYT</title>
+    <style>
+        body {
+            align-items: center;
+            display: flex;
+            font-family: Arial, Helvetica, sans-serif;
+            height: 100vh;
+            justify-content: center;
+            margin: 0;
+        }
+        #search {
+            font-size: large;
+            padding: 2ex;
+        }
+        #autocomplete {
+            background-color: #eee;
+            border: 1px solid #ddd;
+            position: absolute;
+            visibility: hidden;
+            max-height: 50ex;
+        }
+        .result {
+            background-color: #ddd;
+            display: block;
+            margin: 0.5ex;
+            padding: 0.5ex;
+        }
+        .result a {
+            color: black;
+            text-decoration: none;
+        }
+        .result a:hover {
+            color: darkred;
+        }
+
+    </style>
+  </head>
+
+  <body>
+    <div>
+        <input id="search" placeholder="Dictionary" />
+        <div id="autocomplete"></div>
+    </div>
+    <script>
+        const MAX_RESULTS_SHOWN = 10;
+
+        const inputField = document.getElementById('search');
+        const inputHandler = async (event) => {
+            console.log(event.target.value);
+            const queryText = event.target.value.trim();
+            const autocompleteEl = document.getElementById('autocomplete');
+            if (!queryText) {
+                // TODO: Refactor into show/hide function
+                autocompleteEl.style.visibility = 'hidden';
+                return;
+            }
+            // TODO: sanitize, URL-encode
+            // TODO: throttle <---- IMPORTANT! NEXT TODO!
+            const response = await fetch('/s/' + queryText);
+            const results = await response.text();
+            const words = results.split('|').filter(w => w.trim());
+            const filteredResults = words.slice(0, MAX_RESULTS_SHOWN);
+            console.log(words);
+
+            autocompleteEl.style.visibility = words.length > 0 ? 'visible' : 'hidden';
+
+            let resultListMarkup = '';
+            for (let filteredResult of filteredResults) {
+                resultListMarkup += `<span class="result"><a href="https://www.oed.com/search/dictionary/?scope=Entries&q=${filteredResult}">${filteredResult}</a></span>`
+            }
+            autocompleteEl.innerHTML = resultListMarkup;
+        }
+
+        // TODO: keyboard navigation
+
+        inputField.addEventListener('input', inputHandler);
+
+        inputField.focus();
+
+    </script>
+  </body>
+</html>

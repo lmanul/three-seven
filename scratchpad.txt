@@ -1,0 +1,11 @@
+* Source of data
+* Client + server
+* Authentication
+* Size of data? Local search VS remote search
+
+
+
+Server --> Word list
+  ^
+  |
+Client
